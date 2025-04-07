@@ -174,7 +174,7 @@ Tetris.prototype = {
 	},
 	//Start game
 	start:function(){
-		console.log("Nueva forma")
+		console.log("empezo")
 		this.running = true;
 		window.requestAnimationFrame(utils.proxy(this._refresh,this));
 	},
@@ -185,7 +185,7 @@ Tetris.prototype = {
 		this.prevTime = this.currentTime;
 	},
 	//Game over
-	gamveOver:function(){
+	gameveOver:function(){
 
 	},
 	// All key event handlers
@@ -258,44 +258,82 @@ Tetris.prototype = {
 			window.requestAnimationFrame(utils.proxy(this._refresh,this));	
 		}
 	},
-	// Update game data
-	_update:function(){
-		if (this.shape.canDown(this.matrix)){
-			this.shape.goDown(this.matrix);
-		}else{
-			this.shape.copyTo(this.matrix);
-			this._check();
-			this._fireShape();
+	_update: function() {
+		if (this.shape.canDown(this.matrix)) {
+		  this.shape.goDown(this.matrix);
+		} else {
+		  this.shape.copyTo(this.matrix);
+		  this._check();
+		  this._fireShape();
 		}
 		this._draw();
+		
 		this.isGameOver = checkGameOver(this.matrix);
 		views.setGameOver(this.isGameOver);
-		if (this.isGameOver){
-			views.setFinalScore(this.score);
-			
-			// GUARDAR PUNTUACIÓN EN LOCAL STORAGE
-			this._saveScore(this.score);
+		
+		// DEBUG 1 - Verificar que llega aquí
+		console.log("DEBUG 1 - Verificando game over:", this.isGameOver);
+		
+		if (this.isGameOver) {
+		  // DEBUG 2 - Verificar que entra en game over
+		  console.log("DEBUG 2 - Juego terminado, puntuación:", this.score);
+		  
+		  views.setFinalScore(this.score);
+		  
+		  // DEBUG 3 - Antes de guardar
+		  console.log("DEBUG 3 - Intentando guardar puntuación");
+		  
+		  this._saveScore(this.score);
+		  
+		  // DEBUG 4 - Después de guardar
+		  console.log("DEBUG 4 - Puntuación guardada (en teoría)");
 		}
-	},
-	
+	  },
 	// Añade este nuevo método al prototipo
 	_saveScore: function(score) {
-		// Obtener puntuaciones existentes o inicializar array
-		var scores = JSON.parse(localStorage.getItem('tetrisScores')) || [];
-		
-		// Añadir nueva puntuación con fecha
-		scores.push({
+		try {
+		  // Obtener puntuaciones existentes o inicializar array
+		  let scores = JSON.parse(localStorage.getItem('tetrisScores')) || [];
+		  
+		  // Añadir nueva puntuación con fecha y hora
+		  scores.push({
 			score: score,
-			date: new Date().toLocaleDateString()
-		});
-		
-		// Ordenar de mayor a menor y mantener solo top 5
-		scores.sort((a, b) => b.score - a.score);
-		scores = scores.slice(0, 5);
-		
-		// Guardar en Local Storage
-		localStorage.setItem('tetrisScores', JSON.stringify(scores));
-	},
+			date: new Date().toLocaleString() // Muestra fecha y hora
+		  });
+		  
+		  // Ordenar de mayor a menor
+		  scores.sort((a, b) => b.score - a.score);
+		  
+		  // Mantener solo top 5 y eliminar duplicados
+		  const uniqueScores = [];
+		  const scoreSet = new Set();
+		  
+		  for (const item of scores) {
+			if (!scoreSet.has(item.score)) {
+			  scoreSet.add(item.score);
+			  uniqueScores.push(item);
+			  if (uniqueScores.length >= 5) break;
+			}
+		  }
+		  
+		  // Guardar en Local Storage
+		  localStorage.setItem('tetrisScores', JSON.stringify(uniqueScores));
+		  
+		  console.log('Puntuación guardada:', score);
+		} catch (error) {
+		  console.error('Error al guardar la puntuación:', error);
+		}
+	  },
+
+	  getHighScores: function() {
+		try {
+		  const scores = JSON.parse(localStorage.getItem('tetrisScores')) || [];
+		  return scores;
+		} catch (error) {
+		  console.error('Error al leer puntuaciones:', error);
+		  return [];
+		}
+	  },
 	// Check and update game level
 	_checkLevel:function(){
 		var currentTime = new Date().getTime();
@@ -306,6 +344,7 @@ Tetris.prototype = {
 			this.levelTime = currentTime;
 		}
 	}
+	
 }
 
 

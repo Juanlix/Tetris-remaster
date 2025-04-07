@@ -1104,3 +1104,14 @@ var tetrisView = {
 
 module.exports = tetrisView;
 },{"./consts.js":2,"./utils.js":5}]},{},[3]);
+
+const parsedData= JSON.parse(data);
+console.log(personaJSON);var DataEvent =
+{
+	"game": "TeTris",
+	"player": "Juan",
+	"event": "posicion",
+	"value": 30
+}
+var ws = new WebSocket ("wss://gamehubmanager-ucp2025.azurewebsites.net/ws"); 
+	
