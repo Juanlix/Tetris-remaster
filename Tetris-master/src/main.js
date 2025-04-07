@@ -272,22 +272,29 @@ Tetris.prototype = {
 		views.setGameOver(this.isGameOver);
 		if (this.isGameOver){
 			views.setFinalScore(this.score);
+			
+			// GUARDAR PUNTUACIÓN EN LOCAL STORAGE
+			this._saveScore(this.score);
 		}
 	},
-	// Check and update game data
-	_check:function(){
-		var rows = checkFullRows(this.matrix);
-		if (rows.length){
-			removeRows(this.matrix,rows);
-			
-			var score = calcScore(rows);
-			var reward = calcRewards(rows);
-			this.score += score + reward;
-
-			views.setScore(this.score);
-			views.setReward(reward);
-
-		}
+	
+	// Añade este nuevo método al prototipo
+	_saveScore: function(score) {
+		// Obtener puntuaciones existentes o inicializar array
+		var scores = JSON.parse(localStorage.getItem('tetrisScores')) || [];
+		
+		// Añadir nueva puntuación con fecha
+		scores.push({
+			score: score,
+			date: new Date().toLocaleDateString()
+		});
+		
+		// Ordenar de mayor a menor y mantener solo top 5
+		scores.sort((a, b) => b.score - a.score);
+		scores = scores.slice(0, 5);
+		
+		// Guardar en Local Storage
+		localStorage.setItem('tetrisScores', JSON.stringify(scores));
 	},
 	// Check and update game level
 	_checkLevel:function(){
