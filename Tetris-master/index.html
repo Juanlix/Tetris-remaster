@@ -10,6 +10,15 @@
 </head>
 <body>
 <div id="tetris">
+	<!-- Pantalla de inicio -->
+    <div id="startScreen">
+        <h1>Tetris</h1>
+        <form id="playerForm">
+            <input type="text" id="playerName" placeholder="Ingresa tu nombre" required>
+            <button type="submit">Comenzar Juego</button>
+        </form>
+    </div>
+
 	<canvas id="scene"></canvas>
 	<div id="gameOver">
 		<h1>Game Over !</h1>
@@ -32,9 +41,21 @@
 <script src="dist/tetris.js"></script>
 <script>
 	(function(){
-		var tetris = new Tetris('tetris');
-		tetris.start();
-		console.log("choiripas")
-	})();
+        document.getElementById('playerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const playerName = document.getElementById('playerName').value;
+            localStorage.setItem('playerName', playerName);
+            
+            document.getElementById('startScreen').style.display = 'none';
+            const tetris = new Tetris('tetris');
+            tetris.start();
+        });
+
+        // Mostrar el nombre del jugador si ya existe
+        const savedName = localStorage.getItem('playerName');
+        if (savedName) {
+            document.getElementById('playerName').value = savedName;
+        }
+    })();
 </script>
 </html>

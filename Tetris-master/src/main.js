@@ -133,6 +133,7 @@ var defaults = {
 */
 function Tetris(id){
 	this.id = id;
+	this.playerName = "Jugador1"; // 
 	this.init();
 }
 

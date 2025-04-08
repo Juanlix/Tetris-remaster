@@ -405,6 +405,9 @@ Tetris.prototype = {
 		views.setScore(this.score);
 		views.setGameOver(this.isGameOver);
 		this._draw();
+
+		 // Guardar el tiempo de inicio
+		 localStorage.setItem('gameStartTime', this.startTime);
 	},
 	//Start game
 	start:function(){
@@ -420,7 +423,11 @@ Tetris.prototype = {
 	},
 	//Game over
 	gamveOver:function(){
-
+		const endTime = new Date().getTime();
+		const startTime = parseInt(localStorage.getItem('gameStartTime') || this.startTime);
+		const timePlayed = Math.floor((endTime - startTime) / 1000); // en segundos
+		
+		localStorage.setItem('lastGameTime', timePlayed);
 	},
 	// All key event handlers
 	_keydownHandler:function(e){
@@ -520,6 +527,8 @@ Tetris.prototype = {
 
 			views.setScore(this.score);
 			views.setReward(reward);
+
+			localStorage.setItem("tetrisScore",this.score)
 
 		}
 	},

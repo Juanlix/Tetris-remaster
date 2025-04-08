@@ -18,6 +18,11 @@ body{
 	
 }
 
+#startScreen{
+	background: #555;
+	padding: 10px px;
+}
+
 #scene{
 	height:100%;
 	position: absolute;
