@@ -10,12 +10,20 @@
 </head>
 <body>
 <div id="tetris">
+	
+    <div id="startScreen">
+        <h1>Tetris</h1>
+        <form id="playerForm">
+            <input type="text" id="playerName" placeholder="Ingresa tu nombre" required>
+            <button type="submit">Comenzar Juego</button>
+        </form>
+    </div>
+
 	<canvas id="scene"></canvas>
 	<div id="gameOver">
 		<h1>Game Over !</h1>
 		<h3>Score: <span id="finalScore">0</span></h3>
 		<h2><a href="#" id="restart">Restart</a></h2>
-		
 	</div>
 	<div id="side">
 		<div id="info">
@@ -25,16 +33,36 @@
 			<canvas id="preview"></canvas>
 		</div>
 	</div>
-</div>
+    <div id="rankingBox">
+  <h4>🏆 Ranking</h4>
+  <h5><b>1 </b>hola</h5>
+  <h5><b>2 </b>hola</h5>
+  <h5><b>3 </b>hola</h5>
+  <h5><b>4 </b>hola</h5>
+  <h5><b>5 </b>hola</h5>
 
+</div>
 
 </body>
 <script src="dist/tetris.js"></script>
 <script>
 	(function(){
-		var tetris = new Tetris('tetris');
-		tetris.start();
-		console.log("choiripas")
-	})();
+        document.getElementById('playerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const playerName = document.getElementById('playerName').value;
+            localStorage.setItem('playerName', playerName);
+            
+            document.getElementById('startScreen').style.display = 'none';
+            const tetris = new Tetris('tetris');
+            tetris.start();
+        });
+
+        // Mostrar el nombre del jugador si ya existe
+        const savedName = localStorage.getItem('playerName');
+        if (savedName) {
+            document.getElementById('playerName').value = savedName;
+        }
+        
+    })();
 </script>
 </html>

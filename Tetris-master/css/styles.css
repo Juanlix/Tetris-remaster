@@ -18,6 +18,26 @@ body{
 	
 }
 
+#startScreen{
+	background: #555;
+	padding: 10px px;
+}
+
+#side, #rankingBox {
+    display: none;
+}
+
+#rankingBox{position: absolute;
+    top: px;
+    right: 500px;
+    width: 180px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-family: sans-serif;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 20px;
+}
 #scene{
 	height:100%;
 	position: absolute;
