@@ -10,7 +10,7 @@
 </head>
 <body>
 <div id="tetris">
-	<!-- Pantalla de inicio -->
+	
     <div id="startScreen">
         <h1>Tetris</h1>
         <form id="playerForm">
@@ -24,7 +24,6 @@
 		<h1>Game Over !</h1>
 		<h3>Score: <span id="finalScore">0</span></h3>
 		<h2><a href="#" id="restart">Restart</a></h2>
-		
 	</div>
 	<div id="side">
 		<div id="info">
@@ -34,6 +33,9 @@
 			<canvas id="preview"></canvas>
 		</div>
 	</div>
+    <div id="rankingBox">
+  <h4>🏆 Ranking</h4>
+  <h5><b>1 </b>hola</h5>
 </div>
 
 
@@ -56,6 +58,7 @@
         if (savedName) {
             document.getElementById('playerName').value = savedName;
         }
+        
     })();
 </script>
 </html>

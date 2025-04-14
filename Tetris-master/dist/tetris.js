@@ -409,12 +409,48 @@ Tetris.prototype = {
 		 // Guardar el tiempo de inicio
 		 localStorage.setItem('gameStartTime', this.startTime);
 	},
-	//Start game
-	start:function(){
-		console.log("Empezo el juego")
-		this.running = true;
-		window.requestAnimationFrame(utils.proxy(this._refresh,this));
-	},
+
+	// Start game
+start: function () {
+    console.log("🎮 Empezó el juego");
+    this.running = true;
+    window.requestAnimationFrame(utils.proxy(this._refresh, this));
+
+    // Obtener nombre del jugador desde localStorage
+    this.playerName = localStorage.getItem("playerName") || "Anónimo";
+
+    // Establecer conexión WebSocket
+    this.socket = new WebSocket("wss://gamehubmanager-ucp2025.azurewebsites.net/ws");
+
+    this.socket.onopen = () => {
+        console.log("✅ Conectado al servidor WebSocket");
+        // Enviar evento de inicio de juego
+        this.sendEvent("start", 0);
+    };
+
+    this.socket.onmessage = (event) => {
+			const data = JSON.parse(event.data);
+			console.log("📥 Mensaje recibido del servidor:", data);
+	
+			if (data.event === "ranking" && Array.isArray(data.value)) {
+			actualizarRanking(data.value);
+			}
+		};
+
+    // Función para enviar eventos al servidor
+    this.sendEvent = (evento, valor) => {
+        if (this.socket.readyState === WebSocket.OPEN) {
+            const mensaje = {
+                game: "Tetris",
+                event: evento,
+                player: this.playerName,
+                value: valor
+            };
+            this.socket.send(JSON.stringify(mensaje));
+            console.log("📤 Enviado al servidor:", mensaje);
+        }
+    };
+},
 	//Pause game
 	pause:function(){
 		this.running = false;
@@ -529,6 +565,8 @@ Tetris.prototype = {
 			views.setReward(reward);
 
 			localStorage.setItem("tetrisScore",this.score)
+			// ✅ Enviar evento al servidor
+			this.sendEvent("score", this.score);
 
 		}
 	},
@@ -1109,7 +1147,18 @@ var tetrisView = {
 	setGameOver:function(isGameOver){
 		gameOver.style.display = isGameOver?'block':'none';
 	}
+	
 };
+function actualizarRanking(ranking) {
+    const rankingBox = document.getElementById("rankingBox");
+    rankingBox.innerHTML = "<h4>🏆 Ranking</h4>";
+
+    ranking.forEach((jugador, index) => {
+        const entrada = document.createElement("h5");
+        entrada.innerHTML = `<b>${index + 1}</b> ${jugador.player} - ${jugador.score}`;
+        rankingBox.appendChild(entrada);
+    });
+}
 
 module.exports = tetrisView;
 },{"./consts.js":2,"./utils.js":5}]},{},[3]);

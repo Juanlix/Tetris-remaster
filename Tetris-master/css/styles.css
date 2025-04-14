@@ -23,6 +23,17 @@ body{
 	padding: 10px px;
 }
 
+#rankingBox{position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 180px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-family: sans-serif;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 20px;
+}
 #scene{
 	height:100%;
 	position: absolute;
