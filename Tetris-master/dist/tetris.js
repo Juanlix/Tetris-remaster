@@ -362,9 +362,6 @@ var defaults = {
 	maxWidth:600
 };
 
-/**
-	Tetris main object defination
-*/
 function Tetris(id){
 	this.id = id;
 	this.init();
@@ -427,20 +424,33 @@ start: function () {
 
     this.socket.onopen = () => {
         console.log("✅ Conectado al servidor WebSocket");
-        // Enviar evento de inicio de juego
-        console.log("✅ Conectado al servidor WebSocket");
     this.sendEvent("start", 0);
-    this.sendEvent("ranking", 0); // 👈 Solicitamos el ranking aquí
+    this.sendEvent("ranking", 0); 
     };
 
     this.socket.onmessage = (event) => {
-			const data = JSON.parse(event.data);
-			console.log("📥 Mensaje recibido del servidor:", data);
+		const data = JSON.parse(event.data);
+		console.log("📥 Mensaje recibido del servidor:", data);
 	
-			if (data.event === "ranking" && Array.isArray(data.value)) {
-			actualizarRanking(data.value);
-			}
-		};
+		if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].players)) {
+			const ranking = data[0].players;
+			const rankingBox = document.getElementById("rankingBox");
+			rankingBox.innerHTML = "<h4>🏆 Ranking</h4>";
+			
+			// 🔽 Ordenar de mayor a menor por score
+			ranking.sort((a, b) => b.value - a.value);
+
+			ranking.forEach((jugador, index) => {
+				console.log("👀 Jugador recibido:", jugador);
+				const entrada = document.createElement("h5");
+				entrada.innerHTML = `<b>${index + 1}</b> ${jugador.eventName} - ${jugador.value}`;
+				rankingBox.appendChild(entrada);
+			});
+		} else {
+			console.warn("⚠️ Formato inesperado en el ranking:", data);
+		}
+	};
+	
 
     // Función para enviar eventos al servidor
     this.sendEvent = (evento, valor) => {
@@ -586,16 +596,7 @@ start: function () {
 		}
 	}
 }
-function actualizarRanking(ranking) {
-    console.log("Actualizando ranking:", ranking); // <- este log
-    const rankingBox = document.getElementById("rankingBox");
-    rankingBox.innerHTML = "<h4>🏆 Ranking</h4>";
-    ranking.forEach((jugador, index) => {
-        const entrada = document.createElement("h5");
-        entrada.innerHTML = `<b>${index + 1}</b> ${jugador.player} - ${jugador.score}`;
-        rankingBox.appendChild(entrada);
-    });
-}
+
 
 
 window.Tetris = Tetris;
@@ -1169,13 +1170,4 @@ var tetrisView = {
 module.exports = tetrisView;
 },{"./consts.js":2,"./utils.js":5}]},{},[3]);
 
-const parsedData= JSON.parse(data);
-console.log(personaJSON);var DataEvent =
-{
-	"game": "TeTris",
-	"player": "Juan",
-	"event": "posicion",
-	"value": 30
-}
-var ws = new WebSocket ("wss://gamehubmanager-ucp2025.azurewebsites.net/ws"); 
-	
+
