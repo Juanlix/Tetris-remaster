@@ -416,6 +416,8 @@ start: function () {
     this.running = true;
     window.requestAnimationFrame(utils.proxy(this._refresh, this));
 
+	document.getElementById("side").style.display = "block";
+	document.getElementById("rankingBox").style.display = "block";
     // Obtener nombre del jugador desde localStorage
     this.playerName = localStorage.getItem("playerName") || "Anónimo";
 

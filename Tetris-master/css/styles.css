@@ -23,9 +23,13 @@ body{
 	padding: 10px px;
 }
 
+#side, #rankingBox {
+    display: none;
+}
+
 #rankingBox{position: absolute;
-    top: 0px;
-    right: 0px;
+    top: px;
+    right: 500px;
     width: 180px;
     background: rgba(0,0,0,0.6);
     color: white;
