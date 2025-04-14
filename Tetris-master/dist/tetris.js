@@ -418,6 +418,7 @@ start: function () {
 
 	document.getElementById("side").style.display = "block";
 	document.getElementById("rankingBox").style.display = "block";
+
     // Obtener nombre del jugador desde localStorage
     this.playerName = localStorage.getItem("playerName") || "Anónimo";
 
@@ -427,7 +428,9 @@ start: function () {
     this.socket.onopen = () => {
         console.log("✅ Conectado al servidor WebSocket");
         // Enviar evento de inicio de juego
-        this.sendEvent("start", 0);
+        console.log("✅ Conectado al servidor WebSocket");
+    this.sendEvent("start", 0);
+    this.sendEvent("ranking", 0); // 👈 Solicitamos el ranking aquí
     };
 
     this.socket.onmessage = (event) => {
@@ -582,6 +585,16 @@ start: function () {
 			this.levelTime = currentTime;
 		}
 	}
+}
+function actualizarRanking(ranking) {
+    console.log("Actualizando ranking:", ranking); // <- este log
+    const rankingBox = document.getElementById("rankingBox");
+    rankingBox.innerHTML = "<h4>🏆 Ranking</h4>";
+    ranking.forEach((jugador, index) => {
+        const entrada = document.createElement("h5");
+        entrada.innerHTML = `<b>${index + 1}</b> ${jugador.player} - ${jugador.score}`;
+        rankingBox.appendChild(entrada);
+    });
 }
 
 
@@ -1151,16 +1164,7 @@ var tetrisView = {
 	}
 	
 };
-function actualizarRanking(ranking) {
-    const rankingBox = document.getElementById("rankingBox");
-    rankingBox.innerHTML = "<h4>🏆 Ranking</h4>";
 
-    ranking.forEach((jugador, index) => {
-        const entrada = document.createElement("h5");
-        entrada.innerHTML = `<b>${index + 1}</b> ${jugador.player} - ${jugador.score}`;
-        rankingBox.appendChild(entrada);
-    });
-}
 
 module.exports = tetrisView;
 },{"./consts.js":2,"./utils.js":5}]},{},[3]);
