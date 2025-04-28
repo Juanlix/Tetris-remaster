@@ -45,8 +45,13 @@
 </div>
 
 </body>
+<script> if ('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').then(reg=>console.log('service Worker registrado', reg))
+    .catch(err => console.error('Error registrado el Service Worker', err));
+}</script>
 <script src="dist/tetris.js"></script>
 <script>
+    
 	(function(){
         document.getElementById('playerForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -55,7 +60,9 @@
             
             document.getElementById('startScreen').style.display = 'none';
             const tetris = new Tetris('tetris');
+           
             tetris.start();
+            
         });
 
         // Mostrar el nombre del jugador si ya existe
