@@ -152,13 +152,13 @@ var isShapeCanMove = function(shape,matrix,action){
 		}
 		if (action === 'left'){
 			x -= 1;
-			return x>=0 && x<cols && matrix[y][x]==0;
+			return x>=0 && x<cols && matrix[y][x]===0;
 		}else if (action === 'right'){
 			x += 1;
-			return x>=0 && x<cols && matrix[y][x]==0;
+			return x>=0 && x<cols && matrix[y][x]===0;
 		}else if (action === 'down'){
 			y += 1;
-			return y<rows && matrix[y][x]==0;
+			return y<rows && matrix[y][x]===0;
 		}else if (action === 'rotate'){
 			return y<rows && !matrix[y][x];
 		}
