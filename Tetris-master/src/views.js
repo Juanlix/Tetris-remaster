@@ -2,7 +2,7 @@
  All dom definitions and actions
 */
 //var utils = require('./utils.js');
-var consts = require('./consts.js');
+import * as utils from './utils.js';  
 
 //var $ = utils.$;
 
