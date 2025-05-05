@@ -4,7 +4,7 @@
 //var utils = require('./utils.js');
 var consts = require('./consts.js');
 
-var $ = utils.$;
+//var $ = utils.$;
 
 //doms
 var scene = $('scene');
@@ -86,7 +86,7 @@ var tetrisView = {
 	  layoutView(this.container,maxW,maxH);
 	  this.scene.focus();
 
-	  rewardInfo.addEventListener('animationEnd',function(e){
+	  rewardInfo.addEventListener('animationEnd',function(){
 		 rewardInfo.className = 'invisible';
 	  });
 	},

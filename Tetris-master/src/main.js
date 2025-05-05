@@ -39,21 +39,21 @@ var clearMatrix = function(matrix){
 	Check all full rows in game matrix
 	return rows number array. eg: [18,19];
 */
-var checkFullRows = function(matrix){
-	var rowNumbers = [];
-  	for(var i = 0;i<matrix.length;i++){
-  		var row = matrix[i];
-  		var full = true;
-  		for(var j = 0;j<row.length;j++){
-  			full = full&&row[j]!==0;
-  		}
-  		if (full){
-  			rowNumbers.push(i);
-  		}
-  	}
-
-  	return rowNumbers;	
-};
+//var checkFullRows = function(matrix){
+//	var rowNumbers = [];
+//  	for(var i = 0;i<matrix.length;i++){
+//  		var row = matrix[i];
+//  		var full = true;
+//  		for(var j = 0;j<row.length;j++){
+//  			full = full&&row[j]!==0;
+//  		}
+//  		if (full){
+//  			rowNumbers.push(i);
+//  		}
+//  	}
+//
+//  	return rowNumbers;	
+//};
 
 /**
 	Remove one row from game matrix. 
@@ -74,11 +74,11 @@ var removeOneRow = function(matrix,row){
 /**
 	Remove rows from game matrix by row numbers.
 */
-var removeRows = function(matrix,rows){
-	for(var i in rows){
-		removeOneRow(matrix,rows[i]);
-	}
-};
+//var removeRows = function(matrix,rows){
+//	for(var i in rows){
+//		removeOneRow(matrix,rows[i]);
+//	}
+//};
 
 /**
 	Check game data to determin wether the  game is over
@@ -107,12 +107,12 @@ var checkGameOver = function(matrix){
 /**
 	Calculate game score
 */
-var calcScore = function(rows){
-	if (rows&&rows.length){
-		return rows.length*100;
-	}
-	return 0;
-};
+//var calcScore = function(rows){
+//	if (rows&&rows.length){
+//		return rows.length*100;
+//	}
+//	return 0;
+//};
 
 /**
 	Calculate time interval by level, the higher the level,the faster shape moves
