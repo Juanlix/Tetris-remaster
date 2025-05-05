@@ -92,20 +92,19 @@ var tetrisView = {
 	},
 	// Update the score 
 	setScore:function(scoreNumber){
-		score.innerHTML = scoreNumber;	
+		score.textContent = scoreNumber;	
 	},
 	// Update the finnal score
 	setFinalScore:function(scoreNumber){
-		finalScore.innerHTML = scoreNumber;
+		finalScore.textContent = scoreNumber;
 	},
-	// Update the level
-	setLevel:function(levelNumber){
-		level.innerHTML = levelNumber;
+	setLevel: function(levelNumber) {
+		level.textContent = levelNumber;
 	},
 	// Update the extra reward score
 	setReward:function(rewardScore){
 		if (rewardScore>0){
-			reward.innerHTML = rewardScore;
+			reward.textContent= rewardScore;
 			rewardInfo.className = 'fadeOutUp animated';	
 		}else{
 			rewardInfo.className = 'invisible';
