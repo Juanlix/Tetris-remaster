@@ -21,7 +21,7 @@ var finalScore = $('finalScore');
 
 
 //defaults
-import * as consts from './consts.js';
+//import * as consts from './consts.js';
 
 
 /**
