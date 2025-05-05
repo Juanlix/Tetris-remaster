@@ -1,8 +1,8 @@
-var utils = require('./utils.js');
-var consts = require('./consts.js');
-var shapes = require('./shapes.js');
-var views = require('./views.js');
-var canvas = require('./canvas.js');
+import	utils from './utils.js';
+import consts from './consts.js';
+import shapes from './shapes.js';
+import views from './views.js';
+import canvas from './canvas.js';
 
 
 

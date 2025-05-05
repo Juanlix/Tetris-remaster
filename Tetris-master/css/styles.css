@@ -37,6 +37,18 @@ body{
     padding: 10px;
     border-radius: 20px;
 }
+
+#version{position: absolute;
+    top: 600px;
+    right: 500px;
+    width: 180px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-family: sans-serif;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 20px;
+}
 #scene{
 	height:100%;
 	position: absolute;

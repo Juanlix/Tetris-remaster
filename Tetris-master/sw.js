@@ -15,5 +15,7 @@ self.addEventListener('install', async (event) => {
     caches.open(CACHE)
       .then((cache) => cache.add(urlsToCache))
   );
+
 });
+
 
