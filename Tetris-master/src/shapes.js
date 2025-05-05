@@ -1,4 +1,4 @@
-var consts = require('./consts.js');
+import * as consts from './consts.js';
 var COLORS =  consts.COLORS;
 var COLUMN_COUNT = consts.COLUMN_COUNT;
 

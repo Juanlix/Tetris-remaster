@@ -21,7 +21,7 @@ var finalScore = $('finalScore');
 
 
 //defaults
-var SIDE_WIDTH = consts.SIDE_WIDTH;
+import * as consts from './consts.js';
 
 
 /**
