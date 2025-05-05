@@ -97,12 +97,12 @@ var checkGameOver = function(matrix){
 /**
 	Calculate  the extra rewards add to the score
 */
-var calcRewards = function(rows){
-	if (rows&&rows.length>1){
-		return Math.pow(2,rows.length - 1)*100;	
-	}
-	return 0;
-};
+//var calcRewards = function(rows){
+//	if (rows&&rows.length>1){
+//		return Math.pow(2,rows.length - 1)*100;	
+//	}
+//	return 0;
+//};
 
 /**
 	Calculate game score

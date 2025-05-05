@@ -1,6 +1,6 @@
 
-var utils = require('./utils.js');
-var consts = require('./consts.js');
+//var utils = require('./utils.js');
+import consts from './consts.js';
 
 
 var lineColor =  consts.GRID_LINE_COLOR;
