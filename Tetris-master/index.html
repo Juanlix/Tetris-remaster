@@ -40,15 +40,19 @@
    </div>
    <div id="version">
      <h4>🏆 V.18</h4>
-    </div>
+    </div><div id="pwaPrompt" style="text-align:center; margin-top: 10px; display:none;">
+    <button id="installBtn">📲 Instalar App</button>
+</div>
+
 i
 </div>
 
 
 </body>
-<script> if ('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js').then(reg=>console.log('service Worker registrado', reg))
-    .catch(err => console.error('Error registrado el Service Worker', err));
+<script> if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js', { scope: './' })
+    .then(reg => console.log('Service Worker registrado', reg))
+    .catch(err => console.error('Error al registrar el Service Worker', err));
 }</script>
 <script src="dist/tetris.js"></script>
 <script>
