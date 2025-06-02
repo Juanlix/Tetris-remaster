@@ -369,6 +369,8 @@ function Tetris(id){
 
 Tetris.prototype = {
 
+
+	
 	init:function(options){
 		
 		var cfg = this.config = utils.extend(options,defaults);
@@ -418,50 +420,30 @@ Tetris.prototype = {
 		 // Guardar el tiempo de inicio
 		 localStorage.setItem('gameStartTime', this.startTime);
 	},
-	encenderLinterna: async function() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        const track = stream.getVideoTracks()[0];
-        const capabilities = track.getCapabilities();
-        if (capabilities.torch) {
-            await track.applyConstraints({ advanced: [{ torch: true }] });
-            this.currentStream = stream;
-            setTimeout(() => this.apagarLinterna(), 500); // Prende por 0.5 segundos
-        }
-    } catch (e) {
-        console.log("No se pudo encender la linterna", e);
-    }
-	},
-
-	apagarLinterna: function() {
-    if (this.currentStream) {
-        this.currentStream.getTracks().forEach(track => track.stop());
-        this.currentStream = null;
-    }
-	},
+	
 
 	// Start game
-start: function () {
-    console.log("🎮 Empezó el juego");
-	this.initNotificaciones();
-    this.running = true;
-    window.requestAnimationFrame(utils.proxy(this._refresh, this));
+	start: function () {
+    	this.initMobileControls();
+		this.initNotificaciones();
+    	this.running = true;
+   		window.requestAnimationFrame(utils.proxy(this._refresh, this));
 
-	document.getElementById("side").style.display = "block";
-	document.getElementById("rankingBox").style.display = "block";
+		document.getElementById("side").style.display = "block";
+		document.getElementById("rankingBox").style.display = "block";
 
-    // Obtener nombre del jugador desde localStorage
-    this.playerName = localStorage.getItem("playerName") || "Anónimo";
+    	// Obtener nombre del jugador desde localStorage
+    	this.playerName = localStorage.getItem("playerName") || "Anónimo";
 
-    // Establecer conexión WebSocket
-    this.socket = new WebSocket("wss://gamehubmanager-ucp2025.azurewebsites.net/ws");
+	    // Establecer conexión WebSocket
+    	this.socket = new WebSocket("wss://gamehubmanager-ucp2025.azurewebsites.net/ws");
 
-    this.socket.onopen = () => {
+    	this.socket.onopen = () => {
         console.log("✅ Conectado al servidor WebSocket");
-    this.sendEvent("start", 0);
-    this.sendEvent("ranking", 0); 
-	if (window.DeviceOrientationEvent) {
-    window.addEventListener("deviceorientation", function(event) {
+    	this.sendEvent("start", 0);
+    	this.sendEvent("ranking", 0); 
+		if (window.DeviceOrientationEvent) {
+    	window.addEventListener("deviceorientation", function(event) {
         const gamma = event.gamma; // izquierda/derecha (-90 a 90)
         const beta = event.beta;   // arriba/abajo (-180 a 180)
 
@@ -474,9 +456,9 @@ start: function () {
             tetris._draw();
         }
     });
-} else {
+	} else {
     console.log("Este dispositivo no soporta DeviceOrientation");
-}
+	}
     };
 
     this.socket.onmessage = (event) => {
@@ -645,7 +627,81 @@ start: function () {
 			views.setLevel(this.level);
 			this.levelTime = currentTime;
 		}
-	}
+	},
+	//MobileControls
+	initMobileControls: function() {
+    const debugDiv = document.getElementById("gyroDebug");
+
+    if (window.DeviceOrientationEvent) {
+        debugDiv.style.display = "block";
+        debugDiv.innerHTML = "Esperando giroscopio...";
+
+        // 🎛️ Variables de velocidad en milisegundos
+        const velocidadCostados = 200;
+        const velocidadRotacion = 600;
+
+        let ultimaDireccion = "NEUTRAL";
+        let intervaloMovimiento = null;
+
+        const mover = (direccion) => {
+            if (this.shape && !this.isGameOver) {
+                switch (direccion) {
+                    case "LEFT":
+                        this.shape.goLeft(this.matrix);
+                        this._draw();
+                        break;
+                    case "RIGHT":
+                        this.shape.goRight(this.matrix);
+                        this._draw();
+                        break;
+                    case "UP":
+                        this.shape.rotate(this.matrix);
+                        this._draw();
+                        break;
+                    case "DOWN":
+                        this.shape.goDown(this.matrix);
+                        this._draw();
+                        break;
+                }
+            }
+        };
+
+        window.addEventListener("deviceorientation", (event) => {
+            const gamma = event.gamma;
+            const beta = event.beta;
+
+            let direccion = "NEUTRAL";
+
+            if (gamma < -15) {
+                direccion = "LEFT";
+            } else if (gamma > 15) {
+                direccion = "RIGHT";
+            } else if (beta < 20) {
+                direccion = "UP";
+            } else if (beta > 70) {
+                direccion = "DOWN";
+            }
+
+            if (direccion !== ultimaDireccion) {
+                ultimaDireccion = direccion;
+                debugDiv.innerHTML = direccion;
+
+                clearInterval(intervaloMovimiento);
+
+                if (direccion !== "NEUTRAL") {
+                    mover(direccion); // primer movimiento instantáneo
+
+                    let velocidad = velocidadCostados; // default para costados y down
+                    if (direccion === "UP") velocidad = velocidadRotacion;
+
+                    intervaloMovimiento = setInterval(() => mover(direccion), velocidad);
+                }
+            }
+        });
+    } else {
+        debugDiv.style.display = "none";
+    }
+}
 }
 
 
