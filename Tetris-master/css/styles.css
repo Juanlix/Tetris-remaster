@@ -17,7 +17,23 @@ body{
 	background: #555;
 	
 }
+#pwa {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+    display: block;
+}
 
+#installBtn {
+    background: #4285f4;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: none;
+}
 
 #startScreen{
 	padding: 10px px;

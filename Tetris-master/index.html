@@ -39,26 +39,61 @@
          <h5><b>sin Ranking</b></h5>
    </div>
    <div id="version">
-     <h4>🏆 V.19</h4>
-     </div>
+     <h4>🏆 V.19.3</h4>
+   </div>
     <div id="pwa">
-        <button id="installBtn" style="display: inline-block;">📲 Instalar App</button>
-    </div>
+        <button id="installBtn" style="display: none;">📲 Instalar App</button> 
+        </div>
 </div>
 
-
-
-
 </body>
-<script> if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js', { scope: './' })
-    .then(reg => console.log('Service Worker registrado', reg))
-    .catch(err => console.error('Error al registrar el Service Worker', err));
-}</script>
-<script src="dist/tetris.js"></script>
 <script>
+    let deferredPrompt; // Variable para almacenar el evento de instalación
+
+    // 1. Registro del Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js', { scope: './' })
+        .then(reg => console.log('Service Worker registrado', reg))
+        .catch(err => console.error('Error al registrar el Service Worker', err));
+    }
+
+    // 2. Lógica para el botón de instalación de la PWA
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevenir que la mini-barra de información aparezca automáticamente
+        e.preventDefault();
+        // Guardar el evento para dispararlo más tarde
+        deferredPrompt = e;
+        // Mostrar el botón de instalación (si estaba oculto por CSS)
+        const installButton = document.getElementById('installBtn');
+        if (installButton) {
+            installButton.style.display = 'inline-block';
+        }
+        console.log('Evento beforeinstallprompt disparado y botón mostrado');
+    });
+
+    // Escuchar el clic en el botón de instalación
+    document.getElementById('installBtn').addEventListener('click', () => {
+        if (deferredPrompt) {
+            // Mostrar el prompt de instalación al usuario
+            deferredPrompt.prompt();
+            // Esperar a que el usuario responda al prompt
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Usuario aceptó la instalación de la PWA');
+                } else {
+                    console.log('Usuario rechazó la instalación de la PWA');
+                }
+                // Limpiar el evento para que no se pueda usar de nuevo
+                deferredPrompt = null;
+                // Ocultar el botón después de que el prompt se haya mostrado
+                const installButton = document.getElementById('installBtn');
+                if (installButton) {
+                    installButton.style.display = 'none';
+                }
+            });
+        }
+    });
     (function() {
-        // Manejo del formulario del jugador
         document.getElementById('playerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const playerName = document.getElementById('playerName').value;
@@ -69,13 +104,12 @@
             tetris.start();
         });
 
-        // Mostrar el nombre del jugador si ya existe
         const savedName = localStorage.getItem('playerName');
         if (savedName) {
             document.getElementById('playerName').value = savedName;
         }
-
-        
     })();
+
+    </script>
 </script>
-</html>
+<script src="dist/tetris.js"></script>
