@@ -1,5 +1,5 @@
 // Nombre y versión del caché
-const CACHE_NAME = "v19";
+const CACHE_NAME = "v20";
 const urlsToCache = [
   './',
   './dist/tetris.js',
