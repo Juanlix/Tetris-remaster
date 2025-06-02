@@ -1,5 +1,5 @@
 // Nombre y versión del caché
-const CACHE_NAME = "v18";
+const CACHE_NAME = "v19";
 const urlsToCache = [
   './',
   './dist/tetris.js',
@@ -27,18 +27,29 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          self.clients.matchAll().then(clients => {
-            clients.forEach(client => client.postMessage(`Recurso cargado desde caché: ${event.request.url}`));
-          });
-          return response;
+      .then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
         }
-        return fetch(event.request);
+
+        // Si no está en cache, intenta buscar en la red
+        return fetch(event.request)
+          .then((networkResponse) => {
+            return networkResponse;
+          })
+          .catch((error) => {
+            console.error('Fallo de red:', error);
+            return new Response('Offline y sin cache disponible', {
+              status: 503,
+              headers: { 'Content-Type': 'text/plain' }
+            });
+          });
       })
-      .catch((err) => {
-        self.clients.matchAll().then(clients => {
-          clients.forEach(client => client.postMessage(`Error al cargar el recurso: ${event.request.url}`));
+      .catch((error) => {
+        console.error('Error general en fetch handler:', error);
+        return new Response('Error en el SW', {
+          status: 500,
+          headers: { 'Content-Type': 'text/plain' }
         });
       })
   );

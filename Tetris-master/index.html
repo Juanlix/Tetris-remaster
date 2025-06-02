@@ -39,13 +39,12 @@
          <h5><b>sin Ranking</b></h5>
    </div>
    <div id="version">
-     <h4>🏆 V.18</h4>
-    </div><div id="pwaPrompt" style="text-align:center; margin-top: 10px; display:none;">
-    <button id="installBtn">📲 Instalar App</button>
+     <h4>🏆 V.19</h4>
+     <button id="installBtn" style="display: none;">📲 Instalar App</button>
+    </div>
 </div>
 
-i
-</div>
+
 
 
 </body>
@@ -56,8 +55,8 @@ i
 }</script>
 <script src="dist/tetris.js"></script>
 <script>
-    
-	(function(){
+    (function() {
+        // Manejo del formulario del jugador
         document.getElementById('playerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const playerName = document.getElementById('playerName').value;
@@ -65,9 +64,7 @@ i
             
             document.getElementById('startScreen').style.display = 'none';
             const tetris = new Tetris('tetris');
-           
             tetris.start();
-            
         });
 
         // Mostrar el nombre del jugador si ya existe
@@ -75,6 +72,7 @@ i
         if (savedName) {
             document.getElementById('playerName').value = savedName;
         }
+
         
     })();
 </script>

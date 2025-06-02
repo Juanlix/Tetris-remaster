@@ -387,6 +387,18 @@ Tetris.prototype = {
 
 
 	},
+	initNotificaciones: function() {
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+
+    setInterval(() => 
+		{
+        if (Notification.permission === "granted") {
+            new Notification("🔥 ¡Seguí jugando Tetris Master!");
+        	}
+    	}, 300000); // Cada 5 minutos
+	},
 	//Reset game
 	reset:function(){
 		this.running = false;
@@ -406,10 +418,32 @@ Tetris.prototype = {
 		 // Guardar el tiempo de inicio
 		 localStorage.setItem('gameStartTime', this.startTime);
 	},
+	encenderLinterna: async function() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const track = stream.getVideoTracks()[0];
+        const capabilities = track.getCapabilities();
+        if (capabilities.torch) {
+            await track.applyConstraints({ advanced: [{ torch: true }] });
+            this.currentStream = stream;
+            setTimeout(() => this.apagarLinterna(), 500); // Prende por 0.5 segundos
+        }
+    } catch (e) {
+        console.log("No se pudo encender la linterna", e);
+    }
+	},
+
+	apagarLinterna: function() {
+    if (this.currentStream) {
+        this.currentStream.getTracks().forEach(track => track.stop());
+        this.currentStream = null;
+    }
+	},
 
 	// Start game
 start: function () {
     console.log("🎮 Empezó el juego");
+	this.initNotificaciones();
     this.running = true;
     window.requestAnimationFrame(utils.proxy(this._refresh, this));
 
@@ -426,6 +460,23 @@ start: function () {
         console.log("✅ Conectado al servidor WebSocket");
     this.sendEvent("start", 0);
     this.sendEvent("ranking", 0); 
+	if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientation", function(event) {
+        const gamma = event.gamma; // izquierda/derecha (-90 a 90)
+        const beta = event.beta;   // arriba/abajo (-180 a 180)
+
+        // Por ejemplo:
+        if (gamma < -15) {
+            tetris.shape.goLeft(tetris.matrix);
+            tetris._draw();
+        } else if (gamma > 15) {
+            tetris.shape.goRight(tetris.matrix);
+            tetris._draw();
+        }
+    });
+} else {
+    console.log("Este dispositivo no soporta DeviceOrientation");
+}
     };
 
     this.socket.onmessage = (event) => {
@@ -571,7 +622,7 @@ start: function () {
 		var rows = checkFullRows(this.matrix);
 		if (rows.length){
 			removeRows(this.matrix,rows);
-			
+			this.encenderLinterna(); 
 			var score = calcScore(rows);
 			var reward = calcRewards(rows);
 			this.score += score + reward;
