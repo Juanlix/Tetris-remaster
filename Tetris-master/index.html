@@ -50,69 +50,100 @@
     </div>
 
 </body>
-<script>
-    let deferredPrompt; // Variable para almacenar el evento de instalación
 
-    // 1. Registro del Service Worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js', { scope: './' })
-        .then(reg => console.log('Service Worker registrado', reg))
-        .catch(err => console.error('Error al registrar el Service Worker', err));
+<script>
+let deferredPrompt;
+
+// 🔹 [PWA] Registro del Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js', { scope: './' })
+        .then(reg => {
+            console.log('✅ Service Worker registrado', reg);
+
+            // 🔔 [Push] Iniciar suscripción si el navegador lo permite
+            initPushNotifications();
+        })
+        .catch(err => console.error('❌ Error al registrar el Service Worker', err));
+}
+
+// 🔹 [PWA] Mostrar botón de instalación si se puede
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installButton = document.getElementById('installBtn');
+    if (installButton) installButton.style.display = 'inline-block';
+    console.log('🛠️ Evento beforeinstallprompt disparado');
+});
+
+// 🔹 [PWA] Manejar clic en botón de instalación
+document.getElementById('installBtn').addEventListener('click', () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('📲 Usuario aceptó instalación');
+            } else {
+                console.log('🚫 Usuario rechazó instalación');
+            }
+            deferredPrompt = null;
+            document.getElementById('installBtn').style.display = 'none';
+        });
+    }
+});
+
+// 🔄 Guardar nombre del jugador y lanzar juego
+(function () {
+    document.getElementById('playerForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const playerName = document.getElementById('playerName').value;
+        localStorage.setItem('playerName', playerName);
+
+        document.getElementById('startScreen').style.display = 'none';
+        const tetris = new Tetris('tetris');
+        tetris.start();
+    });
+
+    const savedName = localStorage.getItem('playerName');
+    if (savedName) {
+        document.getElementById('playerName').value = savedName;
+    }
+})();
+
+// 🔔 FUNCIONES PUSH API
+const VAPID_PUBLIC_KEY = 'B0kBCAJjxY_Q93v6RuBqXi1PD1zvhFr6VeSZyEhuv-lW7lMTYjSmD1qlKSuDmG2ExjvCHtbjTQ6Y0zo-B2QpwMU';
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function initPushNotifications() {
+    if (!('Notification' in window) || !('PushManager' in window)) {
+        console.warn('🚫 Push API no soportada');
+        return;
     }
 
-    // 2. Lógica para el botón de instalación de la PWA
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevenir que la mini-barra de información aparezca automáticamente
-        e.preventDefault();
-        // Guardar el evento para dispararlo más tarde
-        deferredPrompt = e;
-        // Mostrar el botón de instalación (si estaba oculto por CSS)
-        const installButton = document.getElementById('installBtn');
-        if (installButton) {
-            installButton.style.display = 'inline-block';
-        }
-        console.log('Evento beforeinstallprompt disparado y botón mostrado');
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+        console.warn('🔕 Permiso de notificaciones denegado');
+        return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
     });
 
-    // Escuchar el clic en el botón de instalación
-    document.getElementById('installBtn').addEventListener('click', () => {
-        if (deferredPrompt) {
-            // Mostrar el prompt de instalación al usuario
-            deferredPrompt.prompt();
-            // Esperar a que el usuario responda al prompt
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('Usuario aceptó la instalación de la PWA');
-                } else {
-                    console.log('Usuario rechazó la instalación de la PWA');
-                }
-                // Limpiar el evento para que no se pueda usar de nuevo
-                deferredPrompt = null;
-                // Ocultar el botón después de que el prompt se haya mostrado
-                const installButton = document.getElementById('installBtn');
-                if (installButton) {
-                    installButton.style.display = 'none';
-                }
-            });
-        }
-    });
-    (function() {
-        document.getElementById('playerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const playerName = document.getElementById('playerName').value;
-            localStorage.setItem('playerName', playerName);
-            
-            document.getElementById('startScreen').style.display = 'none';
-            const tetris = new Tetris('tetris');
-            tetris.start();
-        });
+    console.log('📬 Usuario suscrito a notificaciones push:', subscription);
 
-        const savedName = localStorage.getItem('playerName');
-        if (savedName) {
-            document.getElementById('playerName').value = savedName;
-        }
-    })();
+    // 🔐 Aquí podrías enviar esta suscripción a tu servidor:
+    // fetch('/api/save-sub', { method: 'POST', body: JSON.stringify(subscription), headers: { 'Content-Type': 'application/json' } });
 
-    </script>
+    // Para pruebas locales, podés almacenarla en localStorage
+    localStorage.setItem('tetrisPushSubscription', JSON.stringify(subscription));
+}
 </script>
 <script src="dist/tetris.js"></script>

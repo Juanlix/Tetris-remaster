@@ -432,16 +432,17 @@ Tetris.prototype = {
 		document.getElementById("side").style.display = "block";
 		document.getElementById("rankingBox").style.display = "block";
 
-    	// Obtener nombre del jugador desde localStorage
+    	// 🔹 [WEBSOCKET] Guardamos nombre y conectamos al servidor WebSocket
     	this.playerName = localStorage.getItem("playerName") || "Anónimo";
 
-	    // Establecer conexión WebSocket
+	    // 🔹 [WEBSOCKET] Establecer conexión
     	this.socket = new WebSocket("wss://gamehubmanager-ucp2025.azurewebsites.net/ws");
 
     	this.socket.onopen = () => {
-        console.log("✅ Conectado al servidor WebSocket");
-    	this.sendEvent("start", 0);
-    	this.sendEvent("ranking", 0); 
+        	console.log("✅ Conectado al servidor WebSocket");
+			// 🔹 [WEBSOCKET] Enviamos eventos de inicio y ranking
+    		this.sendEvent("start", 0);
+    		this.sendEvent("ranking", 0); 
 		if (window.DeviceOrientationEvent) {
     	window.addEventListener("deviceorientation", function(event) {
         const gamma = event.gamma; // izquierda/derecha (-90 a 90)
@@ -460,7 +461,7 @@ Tetris.prototype = {
     console.log("Este dispositivo no soporta DeviceOrientation");
 	}
     };
-
+	// 🔹 [WEBSOCKET] Recibimos información del servidor y actualizamos ranking
     this.socket.onmessage = (event) => {
 		const data = JSON.parse(event.data);
 		console.log("📥 Mensaje recibido del servidor:", data);
@@ -485,7 +486,7 @@ Tetris.prototype = {
 	};
 	
 
-    // Función para enviar eventos al servidor
+    // 🔹 [WEBSOCKET] Función reutilizable para enviar eventos al servidor
     this.sendEvent = (evento, valor) => {
         if (this.socket.readyState === WebSocket.OPEN) {
             const mensaje = {

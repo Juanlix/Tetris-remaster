@@ -1,4 +1,4 @@
-// Nombre y versión del caché
+// 🔹 [PWA] Archivos a cachear
 const CACHE_NAME = "v19.4";
 const urlsToCache = [
   './',
@@ -10,7 +10,7 @@ const urlsToCache = [
   './icons/512.png'
 ];
 
-// Instalación del Service Worker y cacheo de archivos
+// 🔹 [PWA] Al instalar el SW, se guarda en caché todo lo necesario
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -23,7 +23,7 @@ self.addEventListener('install', (event) => {
   });
 });
 
-// Intercepta las peticiones y sirve desde el caché
+// 🔹 [PWA] Interceptar peticiones y servir desde caché si está disponible
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
@@ -55,7 +55,7 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Limpieza de cachés antiguos al activar un nuevo Service Worker
+// 🔹 [PWA] Limpieza de versiones antiguas del caché
 self.addEventListener('activate', (event) => {
   const whitelist = [CACHE_NAME];
   event.waitUntil(
@@ -72,4 +72,18 @@ self.addEventListener('activate', (event) => {
   self.clients.matchAll().then(clients => {
     clients.forEach(client => client.postMessage("SW activado y cachés antiguos eliminados"));
   });
+});
+
+// 🔹 [PWA] Notificaciones
+self.addEventListener('push', function(event) {
+  const data = event.data.json();
+  const title = data.title || '🔔 Notificación';
+  const options = {
+    body: data.body || '¡Volvé a jugar Tetris!',
+    icon: 'icons/192.png',
+    badge: 'icons/192.png'
+  };
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
 });
