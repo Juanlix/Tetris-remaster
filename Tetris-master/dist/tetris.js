@@ -442,24 +442,9 @@ Tetris.prototype = {
         	console.log("✅ Conectado al servidor WebSocket");
 			// 🔹 [WEBSOCKET] Enviamos eventos de inicio y ranking
     		this.sendEvent("start", 0);
-    		this.sendEvent("ranking", 0); 
-		if (window.DeviceOrientationEvent) {
-    	window.addEventListener("deviceorientation", function(event) {
-        const gamma = event.gamma; // izquierda/derecha (-90 a 90)
-        const beta = event.beta;   // arriba/abajo (-180 a 180)
-
-        // Por ejemplo:
-        if (gamma < -15) {
-            tetris.shape.goLeft(tetris.matrix);
-            tetris._draw();
-        } else if (gamma > 15) {
-            tetris.shape.goRight(tetris.matrix);
-            tetris._draw();
-        }
-    });
-	} else {
-    console.log("Este dispositivo no soporta DeviceOrientation");
-	}
+    		this.sendEvent("ranking", 0);
+		 
+		
     };
 	// 🔹 [WEBSOCKET] Recibimos información del servidor y actualizamos ranking
     this.socket.onmessage = (event) => {
@@ -556,11 +541,16 @@ Tetris.prototype = {
 
 	// Fire a new random shape
 	_fireShape:function(){
-		console.log("disparando forma")
-		this.shape = this.preparedShape||shapes.randomShape();
-		this.preparedShape = shapes.randomShape();
-		this._draw();
-		canvas.drawPreviewShape(this.preparedShape);
+    console.log("disparando forma")
+    this.shape = this.preparedShape||shapes.randomShape();
+    this.preparedShape = shapes.randomShape();
+    this._draw();
+    canvas.drawPreviewShape(this.preparedShape);
+
+    // 🔶 Vibrar suave si la nueva pieza es el cuadrado
+    if (this.shape.flag === 'O') {
+        if (navigator.vibrate) navigator.vibrate(60);
+    }
 	},
 	
 	// Draw game data
@@ -634,75 +624,141 @@ Tetris.prototype = {
     const debugDiv = document.getElementById("gyroDebug");
 
     if (window.DeviceOrientationEvent) {
-        debugDiv.style.display = "block";
-        debugDiv.innerHTML = "Esperando giroscopio...";
-
-        // 🎛️ Variables de velocidad en milisegundos
-        const velocidadCostados = 200;
-        const velocidadRotacion = 600;
-
-        let ultimaDireccion = "NEUTRAL";
-        let intervaloMovimiento = null;
-
-        const mover = (direccion) => {
-            if (this.shape && !this.isGameOver) {
-                switch (direccion) {
-                    case "LEFT":
-                        this.shape.goLeft(this.matrix);
-                        this._draw();
-                        break;
-                    case "RIGHT":
-                        this.shape.goRight(this.matrix);
-                        this._draw();
-                        break;
-                    case "UP":
-                        this.shape.rotate(this.matrix);
-                        this._draw();
-                        break;
-                    case "DOWN":
-                        this.shape.goDown(this.matrix);
-                        this._draw();
-                        break;
-                }
-            }
-        };
-
-        window.addEventListener("deviceorientation", (event) => {
-            const gamma = event.gamma;
-            const beta = event.beta;
-
-            let direccion = "NEUTRAL";
-
-            if (gamma < -15) {
-                direccion = "LEFT";
-            } else if (gamma > 15) {
-                direccion = "RIGHT";
-            } else if (beta < 20) {
-                direccion = "UP";
-            } else if (beta > 70) {
-                direccion = "DOWN";
-            }
-
-            if (direccion !== ultimaDireccion) {
-                ultimaDireccion = direccion;
-                debugDiv.innerHTML = direccion;
-
-                clearInterval(intervaloMovimiento);
-
-                if (direccion !== "NEUTRAL") {
-                    mover(direccion); // primer movimiento instantáneo
-
-                    let velocidad = velocidadCostados; // default para costados y down
-                    if (direccion === "UP") velocidad = velocidadRotacion;
-
-                    intervaloMovimiento = setInterval(() => mover(direccion), velocidad);
-                }
-            }
-        });
-    } else {
-        debugDiv.style.display = "none";
+    if (!/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        console.log("Giroscopio deshabilitado en escritorio.");
+        return;
     }
-}
+
+    debugDiv.style.display = "block";
+    debugDiv.innerHTML = "Esperando giroscopio...";
+
+    // 🎛️ Variables de velocidad en milisegundos
+    const velocidadCostados = 200;
+    const velocidadRotacion = 600;
+
+    let ultimaDireccion = "NEUTRAL";
+    let intervaloMovimiento = null;
+
+    const mover = (direccion) => {
+        if (this.shape && !this.isGameOver) {
+            switch (direccion) {
+                case "LEFT":
+                    this.shape.goLeft(this.matrix);
+                    this._draw();
+                    break;
+                case "RIGHT":
+                    this.shape.goRight(this.matrix);
+                    this._draw();
+                    break;
+                case "UP":
+                    this.shape.rotate(this.matrix);
+                    this._draw();
+                    break;
+                case "DOWN":
+                    this.shape.goDown(this.matrix);
+                    this._draw();
+                    break;
+            }
+        }
+    };
+
+    window.addEventListener("deviceorientation", (event) => {
+    if (event.gamma === null || event.beta === null) return;
+
+    const gamma = event.gamma;
+    const beta = event.beta;
+
+    let direccion = "NEUTRAL";
+
+    if (gamma < -15) {
+        direccion = "LEFT";
+    } else if (gamma > 15) {
+        direccion = "RIGHT";
+    } else if (beta < 20) {
+        direccion = "UP";
+    } else if (beta > 70) {
+        direccion = "DOWN";
+    }
+
+    if (direccion !== ultimaDireccion) {
+        ultimaDireccion = direccion;
+        debugDiv.innerHTML = direccion;
+
+        clearInterval(intervaloMovimiento);
+
+        if (direccion !== "NEUTRAL") {
+            mover(direccion); // primer movimiento instantáneo
+
+            let velocidad = velocidadCostados;
+            if (direccion === "UP") velocidad = velocidadRotacion;
+
+            intervaloMovimiento = setInterval(() => mover(direccion), velocidad);
+        }
+        }
+    });
+		} 	
+			else {
+    		debugDiv.style.display = "none";
+		}
+	},
+	encenderLinterna: async function () {
+    if (!/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+
+    if (navigator.vibrate) navigator.vibrate(200);
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.log("❌ getUserMedia no disponible.");
+        return;
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { exact: "environment" } }
+        });
+        const track = stream.getVideoTracks()[0];
+        const capabilities = track.getCapabilities();
+
+        // 🔦 Método 1: intentar con torch directo
+        if (capabilities.torch) {
+            await track.applyConstraints({ advanced: [{ torch: true }] });
+            console.log("🔦 Linterna encendida (applyConstraints)");
+
+            setTimeout(async () => {
+                await track.applyConstraints({ advanced: [{ torch: false }] });
+                track.stop();
+                console.log("🔦 Linterna apagada");
+            }, 1200);
+            return;
+        }
+
+        // 🔦 Método 2: intentar con ImageCapture como fallback
+        if ('ImageCapture' in window) {
+            try {
+                const imageCapture = new ImageCapture(track);
+                await imageCapture.setOptions({ fillLightMode: "torch" });
+                console.log("🔦 Linterna encendida (ImageCapture)");
+
+                setTimeout(() => {
+                    track.stop();
+                    console.log("🔦 Linterna apagada (ImageCapture)");
+                }, 1200);
+                return;
+            } catch (err) {
+                console.log("❌ Error con ImageCapture:", err);
+                track.stop();
+            }
+        }
+
+        console.log("⚠️ Linterna no soportada en este dispositivo.");
+        track.stop();
+
+    } catch (error) {
+        console.log("❌ Error al intentar usar la linterna:", error);
+    }
+	}
+
+
+	
 }
 
 

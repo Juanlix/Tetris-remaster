@@ -1,5 +1,5 @@
 // 🔹 [PWA] Archivos a cachear
-const CACHE_NAME = "v19.4";
+const CACHE_NAME = "v19.9";
 const urlsToCache = [
   './',
   './dist/tetris.js',
